@@ -11,7 +11,7 @@ import json  # noqa: F401
 from os import path  # noqa: F401
 from re import IGNORECASE, sub  # noqa: F401
 
-import my_module  # noqa: F401
+import tolino_notes  # noqa: F401
 
 
 class TestCode:  # noqa: D101

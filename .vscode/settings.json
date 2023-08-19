@@ -1,6 +1,6 @@
 {
     "python.analysis.extraPaths": [
-        "my_module",
+        "tolino_notes",
         "tests",
         ".venv/bin/python"
     ],
