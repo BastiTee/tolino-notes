@@ -1,4 +1,5 @@
 Pipfile.lock
+output/
 
 # Byte-compiled / optimized / DLL files
 *.py[cod]
@@ -109,4 +110,3 @@ venv.bak/
 
 # Other
 .DS_Store
-
