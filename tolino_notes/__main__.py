@@ -11,11 +11,7 @@ from typing import IO, Optional
 TolinoNote = namedtuple('TolinoNote', 'book page content created')
 
 
-def main(
-    input_file: str,
-    output_dir: str
-) -> None:  # noqa: D103
-
+def main(input_file: str, output_dir: str) -> None:  # noqa: D103
     with open(input_file, 'r') as fh:
         raw_notes = [line.strip() for line in fh.readlines() if line.strip()]
 
@@ -25,16 +21,18 @@ def main(
     for raw in raw_notes:
         if not raw:
             continue
-        opt_note = convert_note(raw)
+        opt_note = __convert_note(raw)
         if opt_note:
             book_notes = notes.get(opt_note.book, [])
             book_notes.append(opt_note)
             notes[opt_note.book] = book_notes
 
     for book in notes.keys():
-        fname = path.join(output_dir, re.sub(
-            r'[^a-z0-9äöü-]+', ' ', book.lower()
-        ).strip().replace(' ', '-') + '.md')
+        fname = path.join(
+            output_dir,
+            re.sub(r'[^a-z0-9äöü-]+', ' ', book.lower()).strip().replace(' ', '-')
+            + '.md',
+        )
         fh = open(fname, 'w+')
 
         def write_io(note: TolinoNote, fh: IO) -> None:
@@ -50,7 +48,7 @@ def main(
         fh.close()
 
 
-def convert_note(raw: str) -> Optional[TolinoNote]:
+def __convert_note(raw: str) -> Optional[TolinoNote]:
     n = raw.split('\n')
     book = n.pop(0).strip()
     # Disclaimer: The 'am' part is language dependend de_DE
@@ -77,30 +75,25 @@ def convert_note(raw: str) -> Optional[TolinoNote]:
         (r'^"\s*', ''),
         (r'\s*"$', ''),
         (r'[“”«»]', '"'),
-        (r'’', '\''),
+        (r'\u2019', '\''),
         (r'\s', ' '),
-        (r'…', '...')
+        (r'…', '...'),
     ]:
         content = re.sub(rep[0], rep[1], content)
 
-    return TolinoNote(
-        book, page, content, created_parsed
-    )
+    return TolinoNote(book, page, content, created_parsed)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--input-file',
-        type=str,
-        help='Input Tolino notes file',
-        required=True
+        '--input-file', type=str, help='Input Tolino notes file', required=True
     )
     parser.add_argument(
         '--output-dir',
         type=str,
         help='Output directory for Markdown files',
-        required=True
+        required=True,
     )
     args = parser.parse_args()
     if not path.isfile(args.input_file):
