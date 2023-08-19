@@ -28,7 +28,6 @@ JSON_DATE_FORMAT = r'%d.%m.%Y %H:%M'
     '-i',
     help='Original Tolino notes file',
     required=True,
-    metavar='PATH',
     type=click.Path(exists=True, dir_okay=False, file_okay=True),
 )
 @click.option(
@@ -36,7 +35,6 @@ JSON_DATE_FORMAT = r'%d.%m.%Y %H:%M'
     '-o',
     help='Folder for output files',
     required=True,
-    metavar='PATH',
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
 )
 @click.option(
@@ -44,7 +42,6 @@ JSON_DATE_FORMAT = r'%d.%m.%Y %H:%M'
     '-l',
     help='Language setting of your Tolino',
     required=True,
-    metavar='LANG',
     type=click.Choice(['de'], case_sensitive=False),
 )
 @click.option(
@@ -53,7 +50,6 @@ JSON_DATE_FORMAT = r'%d.%m.%Y %H:%M'
     'out_format',
     help='Output format',
     required=True,
-    metavar='FORMAT',
     default='md',
     type=click.Choice(['md', 'json'], case_sensitive=False),
 )
