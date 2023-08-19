@@ -1,0 +1,68 @@
+[tool.poetry]
+name = "my_module"
+version = "0.3.1"
+description = ""
+license = "Apache 2.0"
+authors = ["Basti Tee <basti.tee@posteo.de>"]
+maintainers = ["Basti Tee <basti.tee@posteo.de>"]
+readme = "README.md"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11"
+]
+
+[tool.poetry.dependencies]
+python = "^3.8.1"
+
+[tool.poetry.dev-dependencies]
+autopep8 = "^2"
+flake8 = "^6"
+flake8-quotes = "^3"
+flake8-docstrings = "^1"
+flake8-builtins = "^2"
+flake8-blind-except = "^0"
+flake8-use-fstring = "^1"
+flake8-isort = "^6"
+pep8-naming = "^0"
+isort = "^5"
+pytest = "^7"
+mypy = "^1"
+typing-extensions = "^4"
+black = "^23"
+pipdeptree = "^2"
+
+[tool.poetry.scripts]
+my_module_cli = 'my_module.__main__:main'
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+# Untyped definitions and calls
+# Disallows defining functions without type annotations or with
+# incomplete type annotations.
+disallow_untyped_defs = true
+# Type-checks the interior of functions without type annotations
+check_untyped_defs = true
+# Import discovery
+follow_imports = "normal"
+ignore_missing_imports = true
+# Warning configuration
+warn_unused_ignores = true
+warn_unreachable = true
+# Error message config
+# pretty = true
+
+[tool.pytest]
+addopts = "-p no:warnings"
+
+[tool.black]
+skip-string-normalization = true
