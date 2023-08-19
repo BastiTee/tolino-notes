@@ -20,6 +20,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.8.1"
+click = "^8"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "^2"

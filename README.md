@@ -1,3 +1,3 @@
 # Tolino Notes
 
-> Converts Tolino notes into useful formats
+> Convert Tolino notes into useful formats

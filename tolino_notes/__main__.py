@@ -1,66 +1,139 @@
 # -*- coding: utf-8 -*-
 """Module main-file."""
 
-import argparse
+import json
 import re
 from collections import namedtuple
 from datetime import datetime
 from os import path
 from typing import IO, Optional
 
+import click
+
 TolinoNote = namedtuple('TolinoNote', 'book page content created')
 
+LANGUAGES = {
+    'de': {
+        'added_prefix': r'^Hinzugefügt\sam\s',
+        'date_format': r'%d.%m.%Y %H:%M',
+        'marker_prefix': r'^Markierung\sauf\sSeite\s.*',
+    }
+}
+JSON_DATE_FORMAT = r'%d.%m.%Y %H:%M'
 
-def main(input_file: str, output_dir: str) -> None:  # noqa: D103
+
+@click.command(help='Convert Tolino notes into useful formats')
+@click.option(
+    '--input-file',
+    '-i',
+    help='Original Tolino notes file',
+    required=True,
+    metavar='PATH',
+    type=click.Path(exists=True, dir_okay=False, file_okay=True),
+)
+@click.option(
+    '--output-dir',
+    '-o',
+    help='Folder for output files',
+    required=True,
+    metavar='PATH',
+    type=click.Path(exists=True, dir_okay=True, file_okay=False),
+)
+@click.option(
+    '--language',
+    '-l',
+    help='Language setting of your Tolino',
+    required=True,
+    metavar='LANG',
+    type=click.Choice(['de'], case_sensitive=False),
+)
+@click.option(
+    '--format',
+    '-f',
+    'out_format',
+    help='Output format',
+    required=True,
+    metavar='FORMAT',
+    default='md',
+    type=click.Choice(['md', 'json'], case_sensitive=False),
+)
+def main(  # noqa: D103
+    input_file: str, output_dir: str, language: str, out_format: str
+) -> None:
+    # Read content of Tolino notes file
     with open(input_file, 'r') as fh:
-        raw_notes = [line.strip() for line in fh.readlines() if line.strip()]
+        content = [line.strip() for line in fh.readlines() if line.strip()]
 
-    raw_notes = re.split(r'\n\-{10,}\n?', '\n'.join(raw_notes))
+    # Individual notes are separated by dashed lines
+    raw_notes = re.split(r'\n\-{10,}\n?', '\n'.join(content))
+    raw_notes = [raw_note for raw_note in raw_notes if raw_note]
 
+    # Create a note object per raw note
     notes: dict = {}
     for raw in raw_notes:
-        if not raw:
-            continue
-        opt_note = __convert_note(raw)
+        opt_note = __raw_to_tolino_note(raw, language)
         if opt_note:
             book_notes = notes.get(opt_note.book, [])
             book_notes.append(opt_note)
             notes[opt_note.book] = book_notes
 
+    # Write output per book
     for book in notes.keys():
+        # Generate target filename
         fname = path.join(
             output_dir,
             re.sub(r'[^a-z0-9äöü-]+', ' ', book.lower()).strip().replace(' ', '-')
-            + '.md',
+            + '.'
+            + out_format,
         )
+        print(f'Writing notes of "{book}" to {fname}')
         fh = open(fname, 'w+')
 
-        def write_io(note: TolinoNote, fh: IO) -> None:
-            line = f'{note.content} (p. {note.page})'
-            fh.write(line + '\n\n')
+        # Get notes sorted by page
+        notes_sorted = sorted(notes.get(book, []), key=lambda x: x.page)
 
-        print(f'Converting "{book}" to {fname}')
+        # Format output
+        if out_format == 'md':
 
-        fh.write(f'# {book}\n\n')
-        for n in sorted(notes.get(book, []), key=lambda x: x.page):
-            write_io(n, fh)
+            def write_io(note: TolinoNote, fh: IO) -> None:
+                line = f'{note.content} (p. {note.page})'
+                fh.write(line + '\n\n')
+
+            fh.write(f'# {book}\n\n')
+            for n in notes_sorted:
+                write_io(n, fh)
+        elif out_format == 'json':
+            data = {'book': book, 'notes': []}
+            for n in notes_sorted:
+                data['notes'].append(
+                    {
+                        'page': n.page,
+                        'created': n.created.strftime(JSON_DATE_FORMAT),
+                        'note': n.content,
+                    }
+                )
+            json.dump(data, fh, indent=2)
+        else:
+            pass  # Prevented by cmd-line parser
 
         fh.close()
 
 
-def __convert_note(raw: str) -> Optional[TolinoNote]:
-    n = raw.split('\n')
+def __raw_to_tolino_note(raw: str, language: str) -> Optional[TolinoNote]:
+    lang: dict = LANGUAGES[language]
+    n = raw.strip().split('\n')
+
     book = n.pop(0).strip()
-    # Disclaimer: The 'am' part is language dependend de_DE
-    created = re.sub(r'.*\sam\s', '', n.pop(len(n) - 1))
+
+    created = re.sub(lang['added_prefix'], '', n.pop(len(n) - 1))
     created = re.sub(r'\s\|\s', ' ', created)
-    created_parsed = datetime.strptime(created, r'%d.%m.%Y %H:%M')
+    created_parsed = datetime.strptime(created, lang['date_format'])
 
     full_text = '\n'.join(n)
 
-    location = re.sub('-[0-9]+$', '', full_text.split(': ', maxsplit=1)[0])
-    # Disclaimer: The 'Markierung' is language dependend de_DE
-    if 'Markierung' not in location:
+    location = re.sub('-[0-9]+$', '', full_text.split(r': ', maxsplit=1)[0])
+    if not re.match(lang['marker_prefix'], location):
+        # E.g., ignoring bookmarks
         return None
 
     page = int(re.sub(r'\s', ' ', location).split(' ')[-1])
@@ -71,13 +144,16 @@ def __convert_note(raw: str) -> Optional[TolinoNote]:
             for li in full_text.split(': ', maxsplit=1)[1:]
         ]
     )
+
+    # Clean up content
     for rep in [
-        (r'^"\s*', ''),
-        (r'\s*"$', ''),
-        (r'[“”«»]', '"'),
-        (r'\u2019', '\''),
-        (r'\s', ' '),
-        (r'…', '...'),
+        (r'[\u2018\u2019\u00b4`]', '\''),  # Special ticks ’‘´`
+        (r'[“”«»]+', '"'),  # Unwanted quote types
+        (r'\'{2}', '"'),  # Double-quotes made of single-quotes ''
+        (r'\s', ' '),  # Whitespace characters
+        (r'…', '...'),  # Special dashes
+        (r'\s*"\s*$', ''),  # Trailing quotes
+        (r'^\s*"\s*', ''),  # Leading quotes
     ]:
         content = re.sub(rep[0], rep[1], content)
 
@@ -85,21 +161,4 @@ def __convert_note(raw: str) -> Optional[TolinoNote]:
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '--input-file', type=str, help='Input Tolino notes file', required=True
-    )
-    parser.add_argument(
-        '--output-dir',
-        type=str,
-        help='Output directory for Markdown files',
-        required=True,
-    )
-    args = parser.parse_args()
-    if not path.isfile(args.input_file):
-        print(f'Input file {args.input_file} is not a file!')
-        exit(1)
-    if not path.isdir(args.output_dir):
-        print(f'Output dir {args.output_dir} is not a directory!')
-        exit(1)
-    main(args.input_file, args.output_dir)
+    main()

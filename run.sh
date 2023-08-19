@@ -1,10 +1,19 @@
 #!/bin/bash
 cd "$( cd "$( dirname "$0" )"; pwd )"
+set -eof pipefail
 
 mkdir -p output
+
 poetry run python -m tolino_notes \
 --input-file tests/resources/notes.txt \
---output-dir output
+--output-dir output \
+--language de
+
+poetry run python -m tolino_notes \
+--input-file tests/resources/notes.txt \
+--output-dir output \
+--language de \
+--format json
 
 find output -type f -iname "*.md" |while read f
 do
