@@ -12,10 +12,33 @@ How to get the file?
 
 ## Install and use
 
-Install using pip / poetry or similar from PyPi.
+Install using pip / poetry or similar [from PyPi](https://pypi.org/project/tolino-notes/).
 
 ```shell
-python -m pip install tolino_notes
+$ python -m pip install tolino-notes
+```
+
+In a new shell run:
+
+```shell
+$ tolino-notes --help
+Usage: tolino-notes [OPTIONS]
+
+  Convert Tolino notes into useful formats
+
+Options:
+  -i, --input-file FILE       Original Tolino notes file  [required]
+  -o, --output-dir DIRECTORY  Folder for output files  [required]
+  -f, --format [md|json]      Output format  [required]
+  -v, --verbose               Verbose output
+  --help                      Show this message and exit.
+```
+
+For example to convert all your notes to markdown run:
+
+```shell
+$ mkdir output-dir
+$ tolino-notes -i notes.txt -o output-dir -f md
 ```
 
 ## Status
@@ -25,15 +48,10 @@ python -m pip install tolino_notes
 - Support for DE, EN and ES language settings
 - Supported output formats are Markdown and JSON
 
-## Limitation
-
-Tolino stores all your highlights and notes in a file called notes.txt. That's cool, but they're sorted chronologically. It can be quite puzzling if you read several books in parallel. Notulator pulls the text snippets from each other and moves them to separate files: one per book. To convert your notes.txt:
-
-Connect your tolino with USB to your computer. Navigate with the file manager of your computer (Finder or Explorer) to the root directory of your tolino. Drag the file 'notes' or 'notes.txt' to Notulator.
-
 ## Development
 
 - Run `make` to create a new virtual environment
+- Use the [issue tracker](https://github.com/BastiTee/tolino-notes/issues) to let me know about ideas and issues
 
 ## License and attribution
 
