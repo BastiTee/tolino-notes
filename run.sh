@@ -7,13 +7,11 @@ mkdir -p output
 poetry run python -m tolino_notes \
 --input-file tests/resources/notes.txt \
 --output-dir output \
---language de \
 --verbose
 
 poetry run python -m tolino_notes \
 --input-file tests/resources/notes.txt \
 --output-dir output \
---language de \
 --format json \
 --verbose
 

@@ -9,7 +9,7 @@ from typing import IO
 
 import click
 
-from tolino_notes.tolino_note import SUPPORTED_LANGUAGES, TolinoNote
+from tolino_notes.tolino_note import TolinoNote
 
 JSON_DATE_FORMAT = r'%d.%m.%Y %H:%M'
 
@@ -30,13 +30,6 @@ JSON_DATE_FORMAT = r'%d.%m.%Y %H:%M'
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
 )
 @click.option(
-    '--language',
-    '-l',
-    help='Language setting of your Tolino',
-    required=True,
-    type=click.Choice(list(SUPPORTED_LANGUAGES.keys()), case_sensitive=False),
-)
-@click.option(
     '--format',
     '-f',
     'out_format',
@@ -47,7 +40,7 @@ JSON_DATE_FORMAT = r'%d.%m.%Y %H:%M'
 )
 @click.option('--verbose', '-v', help='Verbose output', is_flag=True)
 def main(  # noqa: D103
-    input_file: str, output_dir: str, language: str, out_format: str, verbose: bool
+    input_file: str, output_dir: str, out_format: str, verbose: bool
 ) -> None:
     log.basicConfig(
         level=log.DEBUG if verbose else log.WARNING,
@@ -65,7 +58,7 @@ def main(  # noqa: D103
     log.info('Create a note object per raw note...')
     notes: dict = {}
     for raw in raw_notes:
-        opt_note = TolinoNote.from_unparsed_content(raw, language)
+        opt_note = TolinoNote.from_unparsed_content(raw)
         if opt_note:
             book_notes = notes.get(opt_note.book_title, [])
             book_notes.append(opt_note)
