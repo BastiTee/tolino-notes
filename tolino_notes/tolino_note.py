@@ -55,6 +55,7 @@ class TolinoNote:
     page: int
     cdate: str
     content: Optional[str]
+    user_notes: Optional[str]
 
     @staticmethod
     def __get_language(hint: str) -> Optional[Tuple[dict, str]]:
@@ -68,13 +69,13 @@ class TolinoNote:
     def __clean_string(string: str) -> str:
         string = string.strip()
         for patt_repl in [
+            (r'\s*"\s*$', ''),  # Trailing quotes
+            (r'^\s*"\s*', ''),  # Leading quotes
             (r'[\u2018\u2019\u00b4`]', '\''),  # Special ticks ’‘´`
             (r'[“”«»]+', '"'),  # Unwanted quote types
             (r'\'{2}', '"'),  # Double-quotes made of single-quotes ''
             (r'\s', ' '),  # Whitespace characters
             (r'…', '...'),  # Special dashes
-            (r'\s*"\s*$', ''),  # Trailing quotes
-            (r'^\s*"\s*', ''),  # Leading quotes
         ]:
             string = re.sub(patt_repl[0], patt_repl[1], string)
         return string
@@ -111,11 +112,11 @@ class TolinoNote:
             return None
         lang_dict = lang_id[0]
 
+        # Format the creation date
         cdate = re.sub(lang_dict['cdate_prefix'], '', cdate_line)
         cdate = re.sub(r'\s\|\s', ' ', cdate)
         cdate_parsed = datetime.strftime(
-            datetime.strptime(cdate, lang_dict['date_format']),
-            JSON_DATE_FORMAT
+            datetime.strptime(cdate, lang_dict['date_format']), JSON_DATE_FORMAT
         )
 
         # Remaining content is the note itself
@@ -125,28 +126,55 @@ class TolinoNote:
         prefix = re.sub('-[0-9]+$', '', full_text_split[0])
         page = int(re.sub(r'\s', ' ', prefix).split(' ')[-1])
 
-        note_type: NoteType
-        if re.match(lang_dict['highlight_prefix'] + r'.*', prefix):
-            note_type = NoteType.HIGHLIGHT
+        if re.match(lang_dict['bookmark_prefix'] + r'.*', prefix):
+            # Bookmarks only have arbitrary content so we don't provide it.
+            return TolinoNote(
+                NoteType.BOOKMARK.name, lang_id[1], book_title, page,
+                cdate_parsed, None, None
+            )
+        elif re.match(lang_dict['highlight_prefix'] + r'.*', prefix):
+            # For highlights the entire content is what the user highlighted
+            content = TolinoNote.__clean_string(
+                ' '.join(
+                    [
+                        re.sub(r'\s', ' ', li.strip()).strip()
+                        for li in full_text_split[1:]
+                    ]
+                )
+            )
+            return TolinoNote(
+                NoteType.HIGHLIGHT.name,
+                lang_id[1],
+                book_title,
+                page,
+                cdate_parsed,
+                content,
+                None
+            )
         elif re.match(lang_dict['note_prefix'] + r'.*', prefix):
-            note_type = NoteType.NOTE
-        elif re.match(lang_dict['bookmark_prefix'] + r'.*', prefix):
-            note_type = NoteType.BOOKMARK
+            # For notes it's really bad as we can only guess what the user
+            # wrote and what is marked. Only quotes can guide here.
+            fts = ''.join(full_text_split[1:])
+            # Best guess: Begin of the book highlight is the last quote
+            # preceeded by a line break. ¯\_(ツ)_/¯
+            user_notes = '\n"'.join(fts.split('\n"')[:-1])
+            user_notes = TolinoNote.__clean_string(
+                re.sub(r'\s', ' ', user_notes)
+            )
+            # Before that is what the user wrote
+            highlight = '\n"'.join(fts.split('\n"')[-1:])
+            highlight = TolinoNote.__clean_string(
+                re.sub(r'\s', ' ', highlight)
+            )
+            return TolinoNote(
+                NoteType.NOTE.name,
+                lang_id[1],
+                book_title,
+                page,
+                cdate_parsed,
+                highlight,
+                user_notes
+            )
         else:
             log.warn(f'Unparsable content type: {unparsed_content}')
             return None
-
-        if note_type == NoteType.BOOKMARK:
-            return TolinoNote(
-                str(note_type), lang_id[1], book_title, page, cdate_parsed, None
-            )
-
-        content = TolinoNote.__clean_string(' '.join(
-            [
-                re.sub(r'\s', ' ', li.strip()).strip()
-                for li in full_text_split[1:]
-            ]
-        ))
-        return TolinoNote(
-            str(NoteType.HIGHLIGHT), lang_id[1], book_title, page, cdate_parsed, content
-        )

@@ -72,10 +72,9 @@ def main(  # noqa: D103
         )
         log.info(f'Writing notes of "{book}" to {fname}')
         notes_sorted = sorted(notes.get(book, []), key=lambda x: x.page)
-        non_bookmarks = len([
-            tn for tn in notes_sorted
-            if tn.note_type != NoteType.BOOKMARK.name
-        ])
+        non_bookmarks = len(
+            [tn for tn in notes_sorted if tn.note_type != NoteType.BOOKMARK.name]
+        )
 
         # Format output
         n: TolinoNote
@@ -83,6 +82,7 @@ def main(  # noqa: D103
             if non_bookmarks == 0:
                 continue
             with open(fname, 'w+') as fh:
+
                 def write_io(note: TolinoNote, fh: IO) -> None:
                     line = f'{note.content} (p. {note.page})'
                     fh.write(line + '\n\n')
