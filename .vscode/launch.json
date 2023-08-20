@@ -16,8 +16,6 @@
                 "tests/resources/notes.txt",
                 "--output-dir",
                 "output",
-                "--language",
-                "de"
             ]
         },
         {

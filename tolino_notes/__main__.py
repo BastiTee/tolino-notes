@@ -9,9 +9,7 @@ from typing import IO
 
 import click
 
-from tolino_notes.tolino_note import TolinoNote
-
-JSON_DATE_FORMAT = r'%d.%m.%Y %H:%M'
+from tolino_notes.tolino_note import NoteType, TolinoNote
 
 
 @click.command(help='Convert Tolino notes into useful formats')
@@ -73,34 +71,36 @@ def main(  # noqa: D103
             + out_format,
         )
         log.info(f'Writing notes of "{book}" to {fname}')
-        fh = open(fname, 'w+')
-
         notes_sorted = sorted(notes.get(book, []), key=lambda x: x.page)
+        non_bookmarks = len([
+            tn for tn in notes_sorted
+            if tn.note_type != NoteType.BOOKMARK.name
+        ])
+
         # Format output
+        n: TolinoNote
         if out_format == 'md':
+            if non_bookmarks == 0:
+                continue
+            with open(fname, 'w+') as fh:
+                def write_io(note: TolinoNote, fh: IO) -> None:
+                    line = f'{note.content} (p. {note.page})'
+                    fh.write(line + '\n\n')
 
-            def write_io(note: TolinoNote, fh: IO) -> None:
-                line = f'{note.content} (p. {note.page})'
-                fh.write(line + '\n\n')
-
-            fh.write(f'# {book}\n\n')
-            for n in notes_sorted:
-                write_io(n, fh)
+                fh.write(f'# {book}\n\n')
+                for n in notes_sorted:
+                    if n.note_type == NoteType.HIGHLIGHT.name:
+                        write_io(n, fh)
         elif out_format == 'json':
-            data = {'book': book, 'notes': []}
+            data = []
             for n in notes_sorted:
-                data['notes'].append(
-                    {
-                        'page': n.page,
-                        'created': n.created.strftime(JSON_DATE_FORMAT),
-                        'note': n.content,
-                    }
-                )
-            json.dump(data, fh, indent=2)
+                if n.note_type != NoteType.HIGHLIGHT.name:
+                    continue
+                data.append(n.__dict__)
+            with open(fname, 'w+') as fh:
+                json.dump(data, fh, indent=2)
         else:
             pass  # Prevented by cmd-line parser
-
-        fh.close()
 
 
 if __name__ == '__main__':

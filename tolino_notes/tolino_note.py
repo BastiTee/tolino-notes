@@ -31,6 +31,7 @@ SUPPORTED_LANGUAGES = {
         'date_format': r'%d.%m.%Y %H:%M',
     },
 }
+JSON_DATE_FORMAT = r'%d.%m.%Y %H:%M'
 
 
 class NoteType(Enum):
@@ -40,17 +41,20 @@ class NoteType(Enum):
     NOTE = 2
     BOOKMARK = 3
 
+    def __str__(self) -> str:  # noqa: D105
+        return str(self.name)
+
 
 @dataclass
 class TolinoNote:
     """Class for keeping track of a Tolino note."""
 
-    note_type: NoteType
+    note_type: str
     note_lang: str
     book_title: str
     page: int
-    content: str
-    created: datetime
+    cdate: str
+    content: Optional[str]
 
     @staticmethod
     def __get_language(hint: str) -> Optional[Tuple[dict, str]]:
@@ -59,6 +63,21 @@ class TolinoNote:
             if re.match(cdate_prefix + '.*', hint):
                 return SUPPORTED_LANGUAGES[lang], lang
         return None
+
+    @staticmethod
+    def __clean_string(string: str) -> str:
+        string = string.strip()
+        for patt_repl in [
+            (r'[\u2018\u2019\u00b4`]', '\''),  # Special ticks ’‘´`
+            (r'[“”«»]+', '"'),  # Unwanted quote types
+            (r'\'{2}', '"'),  # Double-quotes made of single-quotes ''
+            (r'\s', ' '),  # Whitespace characters
+            (r'…', '...'),  # Special dashes
+            (r'\s*"\s*$', ''),  # Trailing quotes
+            (r'^\s*"\s*', ''),  # Leading quotes
+        ]:
+            string = re.sub(patt_repl[0], patt_repl[1], string)
+        return string
 
     @staticmethod
     def from_unparsed_content(unparsed_content: str) -> Optional['TolinoNote']:
@@ -80,7 +99,7 @@ class TolinoNote:
         cn = [line for line in cn if not re.match(r'^[\-]+$', line)]
 
         # First line is the book title
-        book_title = cn.pop(0).strip()
+        book_title = TolinoNote.__clean_string(cn.pop(0))
 
         # Last line is the creation date
         cdate_line = cn.pop(len(cn) - 1)
@@ -94,37 +113,40 @@ class TolinoNote:
 
         cdate = re.sub(lang_dict['cdate_prefix'], '', cdate_line)
         cdate = re.sub(r'\s\|\s', ' ', cdate)
-        cdate_parsed = datetime.strptime(cdate, lang_dict['date_format'])
+        cdate_parsed = datetime.strftime(
+            datetime.strptime(cdate, lang_dict['date_format']),
+            JSON_DATE_FORMAT
+        )
 
         # Remaining content is the note itself
         full_text = '\n'.join(cn)
+        full_text_split = full_text.split(r': ', maxsplit=1)
 
-        location = re.sub('-[0-9]+$', '', full_text.split(r': ', maxsplit=1)[0])
-        if not re.match(lang_dict['highlight_prefix'], location):
-            log.warn(f'Unknown content type: {unparsed_content}')
+        prefix = re.sub('-[0-9]+$', '', full_text_split[0])
+        page = int(re.sub(r'\s', ' ', prefix).split(' ')[-1])
+
+        note_type: NoteType
+        if re.match(lang_dict['highlight_prefix'] + r'.*', prefix):
+            note_type = NoteType.HIGHLIGHT
+        elif re.match(lang_dict['note_prefix'] + r'.*', prefix):
+            note_type = NoteType.NOTE
+        elif re.match(lang_dict['bookmark_prefix'] + r'.*', prefix):
+            note_type = NoteType.BOOKMARK
+        else:
+            log.warn(f'Unparsable content type: {unparsed_content}')
             return None
 
-        page = int(re.sub(r'\s', ' ', location).split(' ')[-1])
+        if note_type == NoteType.BOOKMARK:
+            return TolinoNote(
+                str(note_type), lang_id[1], book_title, page, cdate_parsed, None
+            )
 
-        content = ' '.join(
+        content = TolinoNote.__clean_string(' '.join(
             [
                 re.sub(r'\s', ' ', li.strip()).strip()
-                for li in full_text.split(': ', maxsplit=1)[1:]
+                for li in full_text_split[1:]
             ]
-        )
-
-        # Clean up content
-        for rep in [
-            (r'[\u2018\u2019\u00b4`]', '\''),  # Special ticks ’‘´`
-            (r'[“”«»]+', '"'),  # Unwanted quote types
-            (r'\'{2}', '"'),  # Double-quotes made of single-quotes ''
-            (r'\s', ' '),  # Whitespace characters
-            (r'…', '...'),  # Special dashes
-            (r'\s*"\s*$', ''),  # Trailing quotes
-            (r'^\s*"\s*', ''),  # Leading quotes
-        ]:
-            content = re.sub(rep[0], rep[1], content)
-
+        ))
         return TolinoNote(
-            NoteType.HIGHLIGHT, lang_id[1], book_title, page, content, cdate_parsed
+            str(NoteType.HIGHLIGHT), lang_id[1], book_title, page, cdate_parsed, content
         )
