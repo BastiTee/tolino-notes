@@ -5,17 +5,17 @@ set -eof pipefail
 mkdir -p output
 
 poetry run python -m tolino_notes \
---input-file tests/resources/notes.txt \
---output-dir output \
+--input-file ~/Downloads/notes.txt \
+--output-dir ~/Downloads/notes-output \
 --verbose
 
 poetry run python -m tolino_notes \
---input-file tests/resources/notes.txt \
---output-dir output \
+--input-file ~/Downloads/notes.txt \
+--output-dir ~/Downloads/notes-output \
 --format json \
 --verbose
 
-find output -type f -iname "*.md" |while read f
+find ~/Downloads/notes-output -type f -iname "*.md" |while read f
 do
     md5_left=$( md5 ${f} |awk '{print $4}' )
     md5_right=$( md5 ${f}.org |awk '{print $4}' )

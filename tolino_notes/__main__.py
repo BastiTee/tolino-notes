@@ -84,18 +84,21 @@ def main(  # noqa: D103
             with open(fname, 'w+') as fh:
 
                 def write_io(note: TolinoNote, fh: IO) -> None:
+                    if n.note_type == NoteType.BOOKMARK.name:
+                        return
                     line = f'{note.content} (p. {note.page})'
-                    fh.write(line + '\n\n')
+                    if n.note_type == NoteType.NOTE.name:
+                        fh.write(line + '\n')
+                        fh.write(f'> {n.user_notes}\n\n')
+                    else:
+                        fh.write(f'{line}\n\n')
 
                 fh.write(f'# {book}\n\n')
                 for n in notes_sorted:
-                    if n.note_type == NoteType.HIGHLIGHT.name:
-                        write_io(n, fh)
+                    write_io(n, fh)
         elif out_format == 'json':
             data = []
             for n in notes_sorted:
-                if n.note_type != NoteType.HIGHLIGHT.name:
-                    continue
                 data.append(n.__dict__)
             with open(fname, 'w+') as fh:
                 json.dump(data, fh, indent=2)

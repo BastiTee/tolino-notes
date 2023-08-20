@@ -8,9 +8,10 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional, Tuple
 
-SUPPORTED_LANGUAGES = {
+LANGS = {
     'en': {
         'cdate_prefix': r'^Added on ',
+        'cdate_changed_prefix': r'^Changed on ',
         'highlight_prefix': r'Highlight on page ',
         'note_prefix': r'^Note on page ',
         'bookmark_prefix': r'^Bookmark on page ',
@@ -18,6 +19,7 @@ SUPPORTED_LANGUAGES = {
     },
     'de': {
         'cdate_prefix': r'^Hinzugefügt am ',
+        'cdate_changed_prefix': r'^Geändert am ',
         'highlight_prefix': r'^Markierung auf Seite ',
         'note_prefix': r'^Notiz auf Seite ',
         'bookmark_prefix': r'^Lesezeichen auf Seite ',
@@ -25,6 +27,7 @@ SUPPORTED_LANGUAGES = {
     },
     'es': {
         'cdate_prefix': r'^Agregado el ',
+        'cdate_changed_prefix': r'^Modificado el ',
         'highlight_prefix': r'^Marcadores en la página ',
         'note_prefix': r'^Nota en la página ',
         'bookmark_prefix': r'^Selección en la página ',
@@ -59,10 +62,11 @@ class TolinoNote:
 
     @staticmethod
     def __get_language(hint: str) -> Optional[Tuple[dict, str]]:
-        for lang in SUPPORTED_LANGUAGES.keys():
-            cdate_prefix = SUPPORTED_LANGUAGES[lang]['cdate_prefix']
-            if re.match(cdate_prefix + '.*', hint):
-                return SUPPORTED_LANGUAGES[lang], lang
+        for lang in LANGS.keys():
+            if re.match(LANGS[lang]['cdate_prefix'] + '.*', hint) or re.match(
+                LANGS[lang]['cdate_changed_prefix'] + '.*', hint
+            ):
+                return LANGS[lang], lang
         return None
 
     @staticmethod
@@ -114,6 +118,7 @@ class TolinoNote:
 
         # Format the creation date
         cdate = re.sub(lang_dict['cdate_prefix'], '', cdate_line)
+        cdate = re.sub(lang_dict['cdate_changed_prefix'], '', cdate)
         cdate = re.sub(r'\s\|\s', ' ', cdate)
         cdate_parsed = datetime.strftime(
             datetime.strptime(cdate, lang_dict['date_format']), JSON_DATE_FORMAT
@@ -129,8 +134,13 @@ class TolinoNote:
         if re.match(lang_dict['bookmark_prefix'] + r'.*', prefix):
             # Bookmarks only have arbitrary content so we don't provide it.
             return TolinoNote(
-                NoteType.BOOKMARK.name, lang_id[1], book_title, page,
-                cdate_parsed, None, None
+                NoteType.BOOKMARK.name,
+                lang_id[1],
+                book_title,
+                page,
+                cdate_parsed,
+                None,
+                None,
             )
         elif re.match(lang_dict['highlight_prefix'] + r'.*', prefix):
             # For highlights the entire content is what the user highlighted
@@ -149,7 +159,7 @@ class TolinoNote:
                 page,
                 cdate_parsed,
                 content,
-                None
+                None,
             )
         elif re.match(lang_dict['note_prefix'] + r'.*', prefix):
             # For notes it's really bad as we can only guess what the user
@@ -158,14 +168,10 @@ class TolinoNote:
             # Best guess: Begin of the book highlight is the last quote
             # preceeded by a line break. ¯\_(ツ)_/¯
             user_notes = '\n"'.join(fts.split('\n"')[:-1])
-            user_notes = TolinoNote.__clean_string(
-                re.sub(r'\s', ' ', user_notes)
-            )
+            user_notes = TolinoNote.__clean_string(re.sub(r'\s', ' ', user_notes))
             # Before that is what the user wrote
             highlight = '\n"'.join(fts.split('\n"')[-1:])
-            highlight = TolinoNote.__clean_string(
-                re.sub(r'\s', ' ', highlight)
-            )
+            highlight = TolinoNote.__clean_string(re.sub(r'\s', ' ', highlight))
             return TolinoNote(
                 NoteType.NOTE.name,
                 lang_id[1],
@@ -173,7 +179,7 @@ class TolinoNote:
                 page,
                 cdate_parsed,
                 highlight,
-                user_notes
+                user_notes,
             )
         else:
             log.warn(f'Unparsable content type: {unparsed_content}')
