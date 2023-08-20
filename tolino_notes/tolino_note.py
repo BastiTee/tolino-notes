@@ -11,17 +11,23 @@ from typing import Optional, Tuple
 SUPPORTED_LANGUAGES = {
     'en': {
         'cdate_prefix': r'^Added on ',
-        'marker_prefix': r'Highlight on page ',
+        'highlight_prefix': r'Highlight on page ',
+        'note_prefix': r'^Note on page ',
+        'bookmark_prefix': r'^Bookmark on page ',
         'date_format': r'%m/%d/%Y %H:%M',
     },
     'de': {
         'cdate_prefix': r'^Hinzugefügt am ',
-        'marker_prefix': r'^Markierung auf Seite ',
+        'highlight_prefix': r'^Markierung auf Seite ',
+        'note_prefix': r'^Notiz auf Seite ',
+        'bookmark_prefix': r'^Lesezeichen auf Seite ',
         'date_format': r'%d.%m.%Y %H:%M',
     },
     'es': {
         'cdate_prefix': r'^Agregado el ',
-        'marker_prefix': r'^Marcadores en la página ',
+        'highlight_prefix': r'^Marcadores en la página ',
+        'note_prefix': r'^Nota en la página ',
+        'bookmark_prefix': r'^Selección en la página ',
         'date_format': r'%d.%m.%Y %H:%M',
     },
 }
@@ -73,10 +79,13 @@ class TolinoNote:
         cn = [line.strip() for line in unparsed_content.strip().split('\n') if line]
         cn = [line for line in cn if not re.match(r'^[\-]+$', line)]
 
+        # First line is the book title
         book_title = cn.pop(0).strip()
 
-        # Detect language by reading the creation date prefix
+        # Last line is the creation date
         cdate_line = cn.pop(len(cn) - 1)
+
+        # Detect language by reading the creation date prefix
         lang_id = TolinoNote.__get_language(cdate_line)
         if not lang_id:
             log.warn(f'Unsupported language for note: {unparsed_content}')
@@ -87,11 +96,12 @@ class TolinoNote:
         cdate = re.sub(r'\s\|\s', ' ', cdate)
         cdate_parsed = datetime.strptime(cdate, lang_dict['date_format'])
 
+        # Remaining content is the note itself
         full_text = '\n'.join(cn)
 
         location = re.sub('-[0-9]+$', '', full_text.split(r': ', maxsplit=1)[0])
-        if not re.match(lang_dict['marker_prefix'], location):
-            # E.g., ignoring bookmarks
+        if not re.match(lang_dict['highlight_prefix'], location):
+            log.warn(f'Unknown content type: {unparsed_content}')
             return None
 
         page = int(re.sub(r'\s', ' ', location).split(' ')[-1])
