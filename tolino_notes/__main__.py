@@ -4,25 +4,12 @@
 import json
 import logging as log
 import re
-from collections import namedtuple
-from datetime import datetime
 from os import path
-from typing import IO, Optional
+from typing import IO
 
 import click
 
-TolinoNote = namedtuple(
-    'TolinoNote',
-    'book page content created'
-)
-
-LANGUAGES = {
-    'de': {
-        'added_prefix': r'^Hinzugefügt\sam\s',
-        'marker_prefix': r'^Markierung\sauf\sSeite\s.*',
-        'date_format': r'%d.%m.%Y %H:%M',
-    }
-}
+from tolino_notes.tolino_note import SUPPORTED_LANGUAGES, TolinoNote
 
 JSON_DATE_FORMAT = r'%d.%m.%Y %H:%M'
 
@@ -47,7 +34,7 @@ JSON_DATE_FORMAT = r'%d.%m.%Y %H:%M'
     '-l',
     help='Language setting of your Tolino',
     required=True,
-    type=click.Choice(['de'], case_sensitive=False),
+    type=click.Choice(list(SUPPORTED_LANGUAGES.keys()), case_sensitive=False),
 )
 @click.option(
     '--format',
@@ -58,19 +45,13 @@ JSON_DATE_FORMAT = r'%d.%m.%Y %H:%M'
     default='md',
     type=click.Choice(['md', 'json'], case_sensitive=False),
 )
-@click.option(
-    '--verbose',
-    '-v',
-    help='Verbose output',
-    is_flag=True
-)
+@click.option('--verbose', '-v', help='Verbose output', is_flag=True)
 def main(  # noqa: D103
-    input_file: str, output_dir: str, language: str, out_format: str,
-    verbose: bool
+    input_file: str, output_dir: str, language: str, out_format: str, verbose: bool
 ) -> None:
     log.basicConfig(
         level=log.DEBUG if verbose else log.WARNING,
-        format=r'[%(levelname)s] [%(asctime)s] %(message)s'
+        format=r'[%(levelname)s] [%(asctime)s] %(message)s',
     )
 
     log.info('Read content of Tolino notes file...')
@@ -84,11 +65,11 @@ def main(  # noqa: D103
     log.info('Create a note object per raw note...')
     notes: dict = {}
     for raw in raw_notes:
-        opt_note = __raw_to_tolino_note(raw, language)
+        opt_note = TolinoNote.from_unparsed_content(raw, language)
         if opt_note:
-            book_notes = notes.get(opt_note.book, [])
+            book_notes = notes.get(opt_note.book_title, [])
             book_notes.append(opt_note)
-            notes[opt_note.book] = book_notes
+            notes[opt_note.book_title] = book_notes
 
     log.info('Write output per book...')
     for book in notes.keys():
@@ -104,6 +85,7 @@ def main(  # noqa: D103
         notes_sorted = sorted(notes.get(book, []), key=lambda x: x.page)
         # Format output
         if out_format == 'md':
+
             def write_io(note: TolinoNote, fh: IO) -> None:
                 line = f'{note.content} (p. {note.page})'
                 fh.write(line + '\n\n')
@@ -126,47 +108,6 @@ def main(  # noqa: D103
             pass  # Prevented by cmd-line parser
 
         fh.close()
-
-
-def __raw_to_tolino_note(raw: str, language: str) -> Optional[TolinoNote]:
-    lang: dict = LANGUAGES[language]
-    n = raw.strip().split('\n')
-
-    book = n.pop(0).strip()
-
-    created = re.sub(lang['added_prefix'], '', n.pop(len(n) - 1))
-    created = re.sub(r'\s\|\s', ' ', created)
-    created_parsed = datetime.strptime(created, lang['date_format'])
-
-    full_text = '\n'.join(n)
-
-    location = re.sub('-[0-9]+$', '', full_text.split(r': ', maxsplit=1)[0])
-    if not re.match(lang['marker_prefix'], location):
-        # E.g., ignoring bookmarks
-        return None
-
-    page = int(re.sub(r'\s', ' ', location).split(' ')[-1])
-
-    content = ' '.join(
-        [
-            re.sub(r'\s', ' ', li.strip()).strip()
-            for li in full_text.split(': ', maxsplit=1)[1:]
-        ]
-    )
-
-    # Clean up content
-    for rep in [
-        (r'[\u2018\u2019\u00b4`]', '\''),  # Special ticks ’‘´`
-        (r'[“”«»]+', '"'),  # Unwanted quote types
-        (r'\'{2}', '"'),  # Double-quotes made of single-quotes ''
-        (r'\s', ' '),  # Whitespace characters
-        (r'…', '...'),  # Special dashes
-        (r'\s*"\s*$', ''),  # Trailing quotes
-        (r'^\s*"\s*', ''),  # Leading quotes
-    ]:
-        content = re.sub(rep[0], rep[1], content)
-
-    return TolinoNote(book, page, content, created_parsed)
 
 
 if __name__ == '__main__':
