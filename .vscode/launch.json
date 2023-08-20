@@ -2,6 +2,25 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: tolino_notes",
+            "type": "python",
+            "request": "launch",
+            "module": "tolino_notes",
+            "justMyCode": true,
+            "env": {
+                "PYTHONPATH": ".venv"
+            },
+            "console": "integratedTerminal",
+            "args": [
+                "--input-file",
+                "tests/resources/notes.txt",
+                "--output-dir",
+                "output",
+                "--language",
+                "de"
+            ]
+        },
+        {
             "name": "Run current file",
             "type": "python",
             "request": "launch",

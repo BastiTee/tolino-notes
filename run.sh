@@ -7,13 +7,15 @@ mkdir -p output
 poetry run python -m tolino_notes \
 --input-file tests/resources/notes.txt \
 --output-dir output \
---language de
+--language de \
+--verbose
 
 poetry run python -m tolino_notes \
 --input-file tests/resources/notes.txt \
 --output-dir output \
 --language de \
---format json
+--format json \
+--verbose
 
 find output -type f -iname "*.md" |while read f
 do

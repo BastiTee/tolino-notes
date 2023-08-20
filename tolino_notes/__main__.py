@@ -2,6 +2,7 @@
 """Module main-file."""
 
 import json
+import logging as log
 import re
 from collections import namedtuple
 from datetime import datetime
@@ -10,15 +11,19 @@ from typing import IO, Optional
 
 import click
 
-TolinoNote = namedtuple('TolinoNote', 'book page content created')
+TolinoNote = namedtuple(
+    'TolinoNote',
+    'book page content created'
+)
 
 LANGUAGES = {
     'de': {
         'added_prefix': r'^Hinzugefügt\sam\s',
-        'date_format': r'%d.%m.%Y %H:%M',
         'marker_prefix': r'^Markierung\sauf\sSeite\s.*',
+        'date_format': r'%d.%m.%Y %H:%M',
     }
 }
+
 JSON_DATE_FORMAT = r'%d.%m.%Y %H:%M'
 
 
@@ -53,18 +58,30 @@ JSON_DATE_FORMAT = r'%d.%m.%Y %H:%M'
     default='md',
     type=click.Choice(['md', 'json'], case_sensitive=False),
 )
+@click.option(
+    '--verbose',
+    '-v',
+    help='Verbose output',
+    is_flag=True
+)
 def main(  # noqa: D103
-    input_file: str, output_dir: str, language: str, out_format: str
+    input_file: str, output_dir: str, language: str, out_format: str,
+    verbose: bool
 ) -> None:
-    # Read content of Tolino notes file
-    with open(input_file, 'r') as fh:
-        content = [line.strip() for line in fh.readlines() if line.strip()]
+    log.basicConfig(
+        level=log.DEBUG if verbose else log.WARNING,
+        format=r'[%(levelname)s] [%(asctime)s] %(message)s'
+    )
 
-    # Individual notes are separated by dashed lines
-    raw_notes = re.split(r'\n\-{10,}\n?', '\n'.join(content))
+    log.info('Read content of Tolino notes file...')
+    with open(file=input_file, mode='r', encoding='utf-8') as fh:
+        content = [line.strip() for line in fh.readlines() if line.strip()]
+    raw_notes = re.split(  # Individual notes are separated by dashed lines
+        r'\n\-{10,}\n?', '\n'.join(content)
+    )
     raw_notes = [raw_note for raw_note in raw_notes if raw_note]
 
-    # Create a note object per raw note
+    log.info('Create a note object per raw note...')
     notes: dict = {}
     for raw in raw_notes:
         opt_note = __raw_to_tolino_note(raw, language)
@@ -73,24 +90,20 @@ def main(  # noqa: D103
             book_notes.append(opt_note)
             notes[opt_note.book] = book_notes
 
-    # Write output per book
+    log.info('Write output per book...')
     for book in notes.keys():
-        # Generate target filename
         fname = path.join(
             output_dir,
             re.sub(r'[^a-z0-9äöü-]+', ' ', book.lower()).strip().replace(' ', '-')
             + '.'
             + out_format,
         )
-        print(f'Writing notes of "{book}" to {fname}')
+        log.info(f'Writing notes of "{book}" to {fname}')
         fh = open(fname, 'w+')
 
-        # Get notes sorted by page
         notes_sorted = sorted(notes.get(book, []), key=lambda x: x.page)
-
         # Format output
         if out_format == 'md':
-
             def write_io(note: TolinoNote, fh: IO) -> None:
                 line = f'{note.content} (p. {note.page})'
                 fh.write(line + '\n\n')
