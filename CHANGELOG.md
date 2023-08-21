@@ -30,5 +30,5 @@ git tag -a ${VERSION} -m "Version ${VERSION}" &&\
 git push --tags
 ```
 
-- Create a new release under <https://github.com/BastiTee/python-boilerplate/releases> and link to changelog
+- Create a new release under <https://github.com/BastiTee/tolino-notes/releases> and link to changelog
 - Publish to pypi running `poetry publish -u user-name -p "..."`
