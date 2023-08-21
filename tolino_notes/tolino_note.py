@@ -33,6 +33,30 @@ LANGS = {
         'bookmark_prefix': r'^Selección en la página ',
         'date_format': r'%d.%m.%Y %H:%M',
     },
+    'nl': {
+        'cdate_prefix': r'^Toegevoegd op ',
+        'cdate_changed_prefix': r'^Gewijzigd op ',
+        'highlight_prefix': r'^Markering op pagina ',
+        'note_prefix': r'^Notitie op pagina ',
+        'bookmark_prefix': r'^Bladwijzer op pagina ',
+        'date_format': r'%d/%m/%Y %H:%M',
+    },
+    'it': {
+        'cdate_prefix': r'^Aggiunto il ',
+        'cdate_changed_prefix': r'^Modificato il ',
+        'highlight_prefix': r'^Evidenziazione a pagina ',
+        'note_prefix': r'^Nota a pagina ',
+        'bookmark_prefix': r'^Segnalibro a pagina ',
+        'date_format': r'%d.%m.%Y %H:%M',
+    },
+    'fr': {
+        'cdate_prefix': r'^Ajouté le ',
+        'cdate_changed_prefix': r'^Modifié le ',
+        'highlight_prefix': r'^Surlignement en page ',
+        'note_prefix': r'^Note en page ',
+        'bookmark_prefix': r'^Signet en page ',
+        'date_format': r'%d.%m.%Y %H:%M',
+    },
 }
 
 
