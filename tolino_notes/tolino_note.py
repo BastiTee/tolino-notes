@@ -34,7 +34,6 @@ LANGS = {
         'date_format': r'%d.%m.%Y %H:%M',
     },
 }
-JSON_DATE_FORMAT = r'%d.%m.%Y %H:%M'
 
 
 class NoteType(Enum):
@@ -52,11 +51,11 @@ class NoteType(Enum):
 class TolinoNote:
     """Class for keeping track of a Tolino note."""
 
-    note_type: str
+    note_type: NoteType
     note_lang: str
     book_title: str
     page: int
-    cdate: str
+    cdate: datetime
     content: Optional[str]
     user_notes: Optional[str]
 
@@ -120,9 +119,7 @@ class TolinoNote:
         cdate = re.sub(lang_dict['cdate_prefix'], '', cdate_line)
         cdate = re.sub(lang_dict['cdate_changed_prefix'], '', cdate)
         cdate = re.sub(r'\s\|\s', ' ', cdate)
-        cdate_parsed = datetime.strftime(
-            datetime.strptime(cdate, lang_dict['date_format']), JSON_DATE_FORMAT
-        )
+        cdate_parsed = datetime.strptime(cdate, lang_dict['date_format'])
 
         # Remaining content is the note itself
         full_text = '\n'.join(cn)
@@ -134,7 +131,7 @@ class TolinoNote:
         if re.match(lang_dict['bookmark_prefix'] + r'.*', prefix):
             # Bookmarks only have arbitrary content so we don't provide it.
             return TolinoNote(
-                NoteType.BOOKMARK.name,
+                NoteType.BOOKMARK,
                 lang_id[1],
                 book_title,
                 page,
@@ -153,7 +150,7 @@ class TolinoNote:
                 )
             )
             return TolinoNote(
-                NoteType.HIGHLIGHT.name,
+                NoteType.HIGHLIGHT,
                 lang_id[1],
                 book_title,
                 page,
@@ -173,7 +170,7 @@ class TolinoNote:
             highlight = r'\n"'.join(fts.split('\n"')[-1:])
             highlight = TolinoNote.__clean_string(re.sub(r'\s', ' ', highlight))
             return TolinoNote(
-                NoteType.NOTE.name,
+                NoteType.NOTE,
                 lang_id[1],
                 book_title,
                 page,

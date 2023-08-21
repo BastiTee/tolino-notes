@@ -3,7 +3,7 @@
 
 from datetime import datetime
 
-from tolino_notes.tolino_note import JSON_DATE_FORMAT, NoteType, TolinoNote
+from tolino_notes.tolino_note import NoteType, TolinoNote
 
 
 class TestCode:  # noqa: D101
@@ -27,13 +27,13 @@ Hinzugefügt am 15.08.2023 | 18:00
 """
         )
         assert note
-        assert note.note_type == NoteType.HIGHLIGHT.name
+        assert note.note_type == NoteType.HIGHLIGHT
         assert note.note_lang == 'de'
         assert (
             note.book_title
             == 'The Goal: A Process of Ongoing Improvement (Goldratt, Eliyahu M.)'
         )  # noqa: E501
-        assert note.cdate == datetime(2023, 8, 15, 18, 00).strftime(JSON_DATE_FORMAT)
+        assert note.cdate == datetime(2023, 8, 15, 18, 00)
         assert note.page == 286
         assert note.content
         assert note.content.startswith('"So why do you')
@@ -55,10 +55,10 @@ Added on 08/20/2023 | 7:48
 """
         )
         assert note
-        assert note.note_type == NoteType.HIGHLIGHT.name
+        assert note.note_type == NoteType.HIGHLIGHT
         assert note.note_lang == 'en'
         assert note.book_title == 'Ender\'s Game (Card, Orson Scott)'  # noqa: E501
-        assert note.cdate == datetime(2023, 8, 20, 7, 48).strftime(JSON_DATE_FORMAT)
+        assert note.cdate == datetime(2023, 8, 20, 7, 48)
         assert note.page == 77
         assert note.content
         assert note.content.startswith('Ender laughed.')
@@ -80,10 +80,10 @@ Agregado el 20.08.2023 | 7:50
 """
         )
         assert note
-        assert note.note_type == NoteType.HIGHLIGHT.name
+        assert note.note_type == NoteType.HIGHLIGHT
         assert note.note_lang == 'es'
         assert note.book_title == 'Ender\'s Game (Card, Orson Scott)'  # noqa: E501
-        assert note.cdate == datetime(2023, 8, 20, 7, 50).strftime(JSON_DATE_FORMAT)
+        assert note.cdate == datetime(2023, 8, 20, 7, 50)
         assert note.page == 77
         assert note.content
         assert note.content.startswith('got up and walked away ')
@@ -102,10 +102,10 @@ Agregado el 20.08.2023 | 7:50
     """
         )
         assert note
-        assert note.note_type == NoteType.NOTE.name
+        assert note.note_type == NoteType.NOTE
         assert note.note_lang == 'es'
         assert note.book_title == 'Ender\'s Game (Card, Orson Scott)'  # noqa: E501
-        assert note.cdate == datetime(2023, 8, 20, 7, 50).strftime(JSON_DATE_FORMAT)
+        assert note.cdate == datetime(2023, 8, 20, 7, 50)
         assert note.page == 78
         assert note.content
         assert note.content.startswith('On impulse Ender hugged him')
@@ -130,10 +130,10 @@ Hinzugefügt am 20.08.2023 | 14:42
     """
         )
         assert note
-        assert note.note_type == NoteType.NOTE.name
+        assert note.note_type == NoteType.NOTE
         assert note.note_lang == 'de'
         assert note.book_title == 'Ender\'s Game (Card, Orson Scott)'  # noqa: E501
-        assert note.cdate == datetime(2023, 8, 20, 14, 42).strftime(JSON_DATE_FORMAT)
+        assert note.cdate == datetime(2023, 8, 20, 14, 42)
         assert note.page == 99
         assert note.content
         assert note.content.startswith('"Colonel Graff, Either random')
@@ -158,10 +158,10 @@ Hinzugefügt am 20.08.2023 | 15:46
     """
         )
         assert note
-        assert note.note_type == NoteType.NOTE.name
+        assert note.note_type == NoteType.NOTE
         assert note.note_lang == 'de'
         assert note.book_title == 'Ender\'s Game (Card, Orson Scott)'  # noqa: E501
-        assert note.cdate == datetime(2023, 8, 20, 15, 46).strftime(JSON_DATE_FORMAT)
+        assert note.cdate == datetime(2023, 8, 20, 15, 46)
         assert note.page == 99
         assert note.content
         assert note.content.startswith('Then run the simulations')
