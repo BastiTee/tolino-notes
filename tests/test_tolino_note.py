@@ -140,7 +140,7 @@ Hinzugefügt am 20.08.2023 | 14:42
         assert note.content.endswith('Alas."')
         assert note.user_notes
         assert note.user_notes.startswith('Let\'s make a long multi')
-        assert note.user_notes.endswith('quotes like "this')
+        assert note.user_notes.endswith('quotes like "this"')
 
     def test_lang_de_noted_note_3(self) -> None:  # noqa: D102
         note = TolinoNote.from_unparsed_content(

@@ -69,11 +69,15 @@ class TolinoNote:
         return None
 
     @staticmethod
-    def __clean_string(string: str) -> str:
+    def __clean_string(string: str, strip_trail_lead_quotes: bool = True) -> str:
         string = string.strip()
+        if strip_trail_lead_quotes:
+            for patt_repl in [
+                (r'"$', ''),  # Trailing quotes
+                (r'^"', ''),  # Leading quotes
+            ]:
+                string = re.sub(patt_repl[0], patt_repl[1], string)
         for patt_repl in [
-            (r'\s*"\s*$', ''),  # Trailing quotes
-            (r'^\s*"\s*', ''),  # Leading quotes
             (r'[\u2018\u2019\u00b4`]', '\''),  # Special ticks ’‘´`
             (r'[“”«»]+', '"'),  # Unwanted quote types
             (r'\'{2}', '"'),  # Double-quotes made of single-quotes ''
@@ -81,7 +85,7 @@ class TolinoNote:
             (r'…', '...'),  # Special dashes
         ]:
             string = re.sub(patt_repl[0], patt_repl[1], string)
-        return string
+        return string.strip()
 
     @staticmethod
     def from_unparsed_content(unparsed_content: str) -> Optional['TolinoNote']:
@@ -141,14 +145,13 @@ class TolinoNote:
             )
         elif re.match(lang_dict['highlight_prefix'] + r'.*', prefix):
             # For highlights the entire content is what the user highlighted
-            content = TolinoNote.__clean_string(
-                ' '.join(
-                    [
-                        re.sub(r'\s', ' ', li.strip()).strip()
-                        for li in full_text_split[1:]
-                    ]
-                )
+            content = ' '.join(
+                [
+                    re.sub(r'\s', ' ', li.strip()).strip()
+                    for li in full_text_split[1:]
+                ]
             )
+            content = TolinoNote.__clean_string(content)
             return TolinoNote(
                 NoteType.HIGHLIGHT,
                 lang_id[1],
@@ -165,7 +168,9 @@ class TolinoNote:
             # Best guess: Begin of the book highlight is the last quote
             # preceeded by a line break. ¯\_(ツ)_/¯
             user_notes = r'\n"'.join(fts.split('\n"')[:-1])
-            user_notes = TolinoNote.__clean_string(re.sub(r'\s', ' ', user_notes))
+            user_notes = TolinoNote.__clean_string(
+                re.sub(r'\s', ' ', user_notes), False
+            )
             # Before that is what the user wrote
             highlight = r'\n"'.join(fts.split('\n"')[-1:])
             highlight = TolinoNote.__clean_string(re.sub(r'\s', ' ', highlight))

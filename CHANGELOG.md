@@ -2,6 +2,7 @@
 
 ## 0.2.0
 
+- Improve quote handling of highlights with notes
 - Extracted notes writer to separate module
 - Improved type-safety
 - Improve VSCode development environment
