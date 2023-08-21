@@ -2,17 +2,19 @@
 
 > Convert Tolino notes into useful formats
 
-Tolino stores your highlights and notes in a `notes.txt` file on your device. However the format of that file is neither human- nor computer-readable. This project tries to close the gap by parsing the file (somehow) and convert it to a structured file – one per book in your `notes.txt`.
+Tolino stores your highlights and notes in a `notes.txt` file on your device. However that file has a strange structure and mixes books when you read multiple at a time. 
+This project tries to close the gap by doing the heavy-lifting of parsing the file, sorting and converting to a commonly used format such as Markdown or JSON. – one per book found in your `notes.txt`.
 
 How to get the file?
 
 - Connect your Tolino to your computer via USB.
-- Use a file manager (Finder or Explorer) and open the root directory of the device.
+- Use a file manager (Explorer, Finder, etc.) and open the root directory of the device.
 - Look for the `notes.txt` file.
 
 ## Install and use
 
-Install using pip / poetry or similar [from PyPi](https://pypi.org/project/tolino-notes/).
+This is a Python program. Install it using `pip` / `poetry` or similar [from PyPi](https://pypi.org/project/tolino-notes/).
+If you don't yet have `pip` installed, [go here first](https://pip.pypa.io/en/stable/).
 
 ```shell
 $ python -m pip install tolino-notes
@@ -38,20 +40,29 @@ For example to convert all your notes to markdown run:
 
 ```shell
 $ mkdir output-dir
-$ tolino-notes -i notes.txt -o output-dir -f md
+$ tolino-notes --input-file notes.txt --output-dir output-dir --format md
 ```
 
 ## Status
 
-- Successfully tested with Tolino Shine 3
+- Successfully in use with Tolino Shine 3
 - Supports extraction and conversion of highlights, bookmarks and notes
-- Support for DE, EN and ES language settings
+- Support for DE, EN and ES device-language settings
 - Supported output formats are Markdown and JSON
+
+Limitations:
+
+It is a best-guess approach sometimes.
+The `notes.txt` format writes notes sequentially and it is not always clear in which order notes were taken.
+Also separating notes and highlights can only be done based on "quotes", which is not the most robust approach.
+In general, I think 99% of your notes and highlights should be extracted properly.
+
+Use the [issue tracker](https://github.com/BastiTee/tolino-notes/issues) to let me know about ideas and issues
 
 ## Development
 
+- The project is built based on [this](https://github.com/BastiTee/python-boilerplate) boilerplate
 - Run `make` to create a new virtual environment
-- Use the [issue tracker](https://github.com/BastiTee/tolino-notes/issues) to let me know about ideas and issues
 
 ## License and attribution
 
