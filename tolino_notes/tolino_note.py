@@ -167,10 +167,10 @@ class TolinoNote:
             fts = ''.join(full_text_split[1:])
             # Best guess: Begin of the book highlight is the last quote
             # preceeded by a line break. ¯\_(ツ)_/¯
-            user_notes = '\n"'.join(fts.split('\n"')[:-1])
+            user_notes = r'\n"'.join(fts.split('\n"')[:-1])
             user_notes = TolinoNote.__clean_string(re.sub(r'\s', ' ', user_notes))
             # Before that is what the user wrote
-            highlight = '\n"'.join(fts.split('\n"')[-1:])
+            highlight = r'\n"'.join(fts.split('\n"')[-1:])
             highlight = TolinoNote.__clean_string(re.sub(r'\s', ' ', highlight))
             return TolinoNote(
                 NoteType.NOTE.name,
