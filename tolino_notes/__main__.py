@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 """Module main-file."""
 
-import json
 import logging as log
 import re
 from os import path
-from typing import IO
 
 import click
 
-from tolino_notes.tolino_note import NoteType, TolinoNote
+from tolino_notes import notes_writer
+from tolino_notes.tolino_note import TolinoNote
 
 
 @click.command(help='Convert Tolino notes into useful formats')
@@ -64,44 +63,18 @@ def main(  # noqa: D103
 
     log.info('Write output per book...')
     for book in notes.keys():
-        fname = path.join(
+        output_file = path.join(
             output_dir,
             re.sub(r'[^a-z0-9äöü-]+', ' ', book.lower()).strip().replace(' ', '-')
             + '.'
             + out_format,
         )
-        log.info(f'Writing notes of "{book}" to {fname}')
-        notes_sorted = sorted(notes.get(book, []), key=lambda x: x.page)
-        non_bookmarks = len(
-            [tn for tn in notes_sorted if tn.note_type != NoteType.BOOKMARK.name]
-        )
+        log.info(f'Writing notes of "{book}" to {output_file}')
 
-        # Format output
-        n: TolinoNote
         if out_format == 'md':
-            if non_bookmarks == 0:
-                continue
-            with open(fname, 'w+') as fh:
-
-                def write_io(note: TolinoNote, fh: IO) -> None:
-                    if n.note_type == NoteType.BOOKMARK.name:
-                        return
-                    line = f'{note.content} (p. {note.page})'
-                    if n.note_type == NoteType.NOTE.name:
-                        fh.write(line + '\n')
-                        fh.write(f'> {n.user_notes}\n\n')
-                    else:
-                        fh.write(f'{line}\n\n')
-
-                fh.write(f'# {book}\n\n')
-                for n in notes_sorted:
-                    write_io(n, fh)
+            notes_writer.write_to_markdown(notes.get(book, []), output_file)
         elif out_format == 'json':
-            data = []
-            for n in notes_sorted:
-                data.append(n.__dict__)
-            with open(fname, 'w+') as fh:
-                json.dump(data, fh, indent=2)
+            notes_writer.write_to_json(notes.get(book, []), output_file)
         else:
             pass  # Prevented by cmd-line parser
 

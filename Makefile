@@ -1,4 +1,3 @@
-# Required executables
 ifeq (, $(shell which python))
  $(error "No python on PATH.")
 endif
@@ -12,12 +11,8 @@ export LANG = C.UTF-8
 PY_FILES := tolino_notes tests
 VERSION := $(shell poetry version --short)
 
-# Bundle tasks
-
 all: clean venv build
 	@echo Executed default build pipeline
-
-# Clean up and set up
 
 clean:
 	@echo Clean project base
@@ -45,8 +40,6 @@ venv: clean
 shell:
 	@echo Open a new shell using virtualenv
 	$(POETRY_CMD) shell
-
-# Building software
 
 build: test mypy isort black lint
 	@echo Run build process to package application
@@ -79,15 +72,3 @@ lint:
 outdated:
 	@echo Show outdated dependencies
 	$(POETRY_CMD) show --outdated
-
-# Executing
-
-run-venv:
-	@echo Execute package directly in virtual environment
-	$(POETRY_CMD) run python -m tolino_notes
-
-install-run:
-	@echo Install and run package via CLI using the activated Python env
-	python -m pip install --upgrade .
-	@echo --- Note: The next command might fail before you reload your shell
-	tolino_notes_cli
