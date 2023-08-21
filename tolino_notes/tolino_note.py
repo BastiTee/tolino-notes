@@ -146,10 +146,7 @@ class TolinoNote:
         elif re.match(lang_dict['highlight_prefix'] + r'.*', prefix):
             # For highlights the entire content is what the user highlighted
             content = ' '.join(
-                [
-                    re.sub(r'\s', ' ', li.strip()).strip()
-                    for li in full_text_split[1:]
-                ]
+                [re.sub(r'\s', ' ', li.strip()).strip() for li in full_text_split[1:]]
             )
             content = TolinoNote.__clean_string(content)
             return TolinoNote(
