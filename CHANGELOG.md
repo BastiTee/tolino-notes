@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.0
+
+- Add language support for FR, IT, NL
+
 ## 0.2.0
 
 - Improve quote handling of highlights with notes
