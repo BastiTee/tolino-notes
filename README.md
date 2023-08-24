@@ -4,6 +4,8 @@
 
 ![PyPI](https://img.shields.io/pypi/v/tolino-notes)
 
+![Tolino](GFX-SOCIAL.jpg)
+
 Tolino stores your highlights and notes in a `notes.txt` file on your device. However that file has a strange structure and mixes books when you read multiple ones at a time. And the content depends on the language-setting of your device.
 
 This project tries to close the gap by doing the heavy-lifting of parsing the file, sorting and converting to a commonly used format such as Markdown or JSON. – one file per book found in your `notes.txt`.
