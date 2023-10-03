@@ -13,7 +13,7 @@
             "console": "integratedTerminal",
             "args": [
                 "--input-file",
-                "tests/resources/notes.txt",
+                "output/notes.txt",
                 "--output-dir",
                 "output",
             ]
