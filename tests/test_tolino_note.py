@@ -169,3 +169,20 @@ Hinzugefügt am 20.08.2023 | 15:46
         assert note.user_notes
         assert note.user_notes.startswith('Test Note')
         assert note.user_notes.endswith('quotes" at beginning.')
+
+    def test_issue_dkuester_github_3(self) -> None:  # noqa: D102
+        note = TolinoNote.from_unparsed_content(
+            """Miss Merkel (Safier, David)
+Markierung"In diesem Moment realisierte Angela, dass sie zwar während ihrer ganzen
+Regierungszeit...mals das Gefühl, das wirklich zu erleben"
+Geändert am 21.08.2022 | 22:55"""
+        )
+        assert note
+        assert note.note_type == NoteType.HIGHLIGHT
+        assert note.note_lang == 'de'
+        assert note.book_title == 'Miss Merkel (Safier, David)'  # noqa: E501
+        assert note.cdate == datetime(2022, 8, 21, 22, 55)
+        assert note.page == 0
+        assert note.content
+        assert note.content.startswith('In diesem Moment')
+        assert note.content.endswith('das wirklich zu erleben')

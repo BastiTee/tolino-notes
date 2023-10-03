@@ -71,6 +71,9 @@ class NoteType(Enum):
         return str(self.name)
 
 
+FALLBACK_TYPE = 'HIGHLIGHT'
+
+
 @dataclass
 class TolinoNote:
     """Class for keeping track of a Tolino note."""
@@ -151,10 +154,19 @@ class TolinoNote:
 
         # Remaining content is the note itself
         full_text = '\n'.join(cn)
-        full_text_split = full_text.split(r': ', maxsplit=1)
+        location_split = full_text.split(r': ', maxsplit=1)
 
-        prefix = re.sub('-[0-9]+$', '', full_text_split[0])
-        page = int(re.sub(r'\s', ' ', prefix).split(' ')[-1])
+        # Normally there is a prefix like "Note on page 123:"
+        if len(location_split) > 1:
+            prefix = re.sub('-[0-9]+$', '', location_split[0])
+            page = int(re.sub(r'\s', ' ', prefix).split(' ')[-1])
+        else:
+            # If that's not the case we need to work around.
+            prefix = FALLBACK_TYPE
+            # And strip any potential prefix until the first quote
+            location_split[0] = '"'.join(location_split[0].split('"')[1:])
+            location_split = [''] + location_split
+            page = 0
 
         if re.match(lang_dict['bookmark_prefix'] + r'.*', prefix):
             # Bookmarks only have arbitrary content so we don't provide it.
@@ -167,10 +179,13 @@ class TolinoNote:
                 None,
                 None,
             )
-        elif re.match(lang_dict['highlight_prefix'] + r'.*', prefix):
+        elif (
+            re.match(lang_dict['highlight_prefix'] + r'.*', prefix)
+            or prefix == FALLBACK_TYPE
+        ):
             # For highlights the entire content is what the user highlighted
             content = ' '.join(
-                [re.sub(r'\s', ' ', li.strip()).strip() for li in full_text_split[1:]]
+                [re.sub(r'\s', ' ', li.strip()).strip() for li in location_split[1:]]
             )
             content = TolinoNote.__clean_string(content)
             return TolinoNote(
@@ -185,7 +200,7 @@ class TolinoNote:
         elif re.match(lang_dict['note_prefix'] + r'.*', prefix):
             # For notes it's really bad as we can only guess what the user
             # wrote and what is marked. Only quotes can guide here.
-            fts = ''.join(full_text_split[1:])
+            fts = ''.join(location_split[1:])
             # Best guess: Begin of the book highlight is the last quote
             # preceeded by a line break. ¯\_(ツ)_/¯
             user_notes = r'\n"'.join(fts.split('\n"')[:-1])
