@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1
+
+- Fix issue [#3](https://github.com/BastiTee/tolino-notes/issues/3)
+
 ## 0.3.0
 
 - Add language support for FR, IT, NL
@@ -7,14 +11,14 @@
 ## 0.2.0
 
 - Improve quote handling of highlights with notes
-- Extracted notes writer to separate module
-- Improved type-safety
+- Extract notes writer to separate module
+- Improve type-safety
 - Improve VSCode development environment
 
 ## 0.1.0
 
-- Updated README and added CHANGELOG
-- Updated pyproject.toml
+- Update README and added CHANGELOG
+- Update pyproject.toml
 
 ## 0.0.1
 
