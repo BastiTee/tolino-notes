@@ -1,10 +1,10 @@
 [tool.poetry]
 name = "tolino_notes"
-version = "0.3.1"
+version = "0.3.2"
 description = ""
 license = "Apache 2.0"
-authors = ["Basti Tee <basti.tee@posteo.de>"]
-maintainers = ["Basti Tee <basti.tee@posteo.de>"]
+authors = ["Basti Tee <basti.tee@icloud.com>"]
+maintainers = ["Basti Tee <basti.tee@icloud.com>"]
 readme = "README.md"
 classifiers = [
     "Development Status :: 4 - Beta",
