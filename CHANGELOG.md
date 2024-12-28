@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.2
+
+- Upgraded dependencies
+- Updated supported Python versions
+
 ## 0.3.1
 
 - Fix issue [#3](https://github.com/BastiTee/tolino-notes/issues/3)
