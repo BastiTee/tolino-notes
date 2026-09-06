@@ -12,8 +12,7 @@ class TestCode:  # noqa: D101
         assert not TolinoNote.from_unparsed_content(r'   ')
 
     def test_lang_de_marker_note(self) -> None:  # noqa: D102
-        note = TolinoNote.from_unparsed_content(
-            """
+        note = TolinoNote.from_unparsed_content("""
 
 
 The Goal: A Process of Ongoing Improvement (Goldratt, Eliyahu M.)
@@ -24,8 +23,7 @@ Hinzugefügt am 15.08.2023 | 18:00
 
 -----------------------------------
 
-"""
-        )
+""")
         assert note
         assert note.note_type == NoteType.HIGHLIGHT
         assert note.note_lang == 'de'
@@ -40,8 +38,7 @@ Hinzugefügt am 15.08.2023 | 18:00
         assert note.content.endswith('"They talked, we did."')
 
     def test_lang_en_marker_note(self) -> None:  # noqa: D102
-        note = TolinoNote.from_unparsed_content(
-            """
+        note = TolinoNote.from_unparsed_content("""
 
 Ender's Game (Card, Orson Scott)
 Highlight on page 77: "Ender laughed. “I’ll set up a system for you.”
@@ -52,8 +49,7 @@ Added on 08/20/2023 | 7:48
 
 -----------------------------------
 
-"""
-        )
+""")
         assert note
         assert note.note_type == NoteType.HIGHLIGHT
         assert note.note_lang == 'en'
@@ -65,8 +61,7 @@ Added on 08/20/2023 | 7:48
         assert note.content.endswith('You never finish eating."')
 
     def test_lang_es_marker_note(self) -> None:  # noqa: D102
-        note = TolinoNote.from_unparsed_content(
-            """
+        note = TolinoNote.from_unparsed_content("""
 
 
 Ender's Game (Card, Orson Scott)
@@ -77,8 +72,7 @@ Ender turned around. Alai was holding a little piece of paper.
 Alai looked up at him. “Don’t you know? This was on your bed. You "
 Agregado el 20.08.2023 | 7:50
 
-"""
-        )
+""")
         assert note
         assert note.note_type == NoteType.HIGHLIGHT
         assert note.note_lang == 'es'
@@ -90,8 +84,7 @@ Agregado el 20.08.2023 | 7:50
         assert note.content.endswith('This was on your bed. You')
 
     def test_lang_de_noted_note_1(self) -> None:  # noqa: D102
-        note = TolinoNote.from_unparsed_content(
-            """
+        note = TolinoNote.from_unparsed_content("""
 
 Ender’s Game (Card, Orson Scott)
 Nota en la página 78: Note in Spanish.
@@ -99,8 +92,7 @@ Nota en la página 78: Note in Spanish.
 Agregado el 20.08.2023 | 7:50
 
 ------
-    """
-        )
+    """)
         assert note
         assert note.note_type == NoteType.NOTE
         assert note.note_lang == 'es'
@@ -114,8 +106,7 @@ Agregado el 20.08.2023 | 7:50
         assert note.user_notes == 'Note in Spanish.'
 
     def test_lang_de_noted_note_2(self) -> None:  # noqa: D102
-        note = TolinoNote.from_unparsed_content(
-            """
+        note = TolinoNote.from_unparsed_content("""
 Ender’s Game (Card, Orson Scott)
 Notiz auf Seite 99: Let's make a long multi line comment.
 
@@ -127,8 +118,7 @@ And even include quotes like "this"
 “Alas.”"
 Hinzugefügt am 20.08.2023 | 14:42
 
-    """
-        )
+    """)
         assert note
         assert note.note_type == NoteType.NOTE
         assert note.note_lang == 'de'
@@ -143,8 +133,7 @@ Hinzugefügt am 20.08.2023 | 14:42
         assert note.user_notes.endswith('quotes like "this"')
 
     def test_lang_de_noted_note_3(self) -> None:  # noqa: D102
-        note = TolinoNote.from_unparsed_content(
-            """
+        note = TolinoNote.from_unparsed_content("""
 
 Ender’s Game (Card, Orson Scott)
 Notiz auf Seite 99: Test Note
@@ -155,8 +144,7 @@ Hinzugefügt am 20.08.2023 | 15:46
 -----------------------------------
 
 
-    """
-        )
+    """)
         assert note
         assert note.note_type == NoteType.NOTE
         assert note.note_lang == 'de'
@@ -171,12 +159,10 @@ Hinzugefügt am 20.08.2023 | 15:46
         assert note.user_notes.endswith('quotes" at beginning.')
 
     def test_issue_dkuester_github_3(self) -> None:  # noqa: D102
-        note = TolinoNote.from_unparsed_content(
-            """Miss Merkel (Safier, David)
+        note = TolinoNote.from_unparsed_content("""Miss Merkel (Safier, David)
 Markierung"In diesem Moment realisierte Angela, dass sie zwar während ihrer ganzen
 Regierungszeit...mals das Gefühl, das wirklich zu erleben"
-Geändert am 21.08.2022 | 22:55"""
-        )
+Geändert am 21.08.2022 | 22:55""")
         assert note
         assert note.note_type == NoteType.HIGHLIGHT
         assert note.note_lang == 'de'

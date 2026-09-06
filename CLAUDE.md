@@ -24,7 +24,7 @@ Run a single test: `poetry run py.test tests/test_tolino_note.py::TestCode::test
 
 Run the CLI locally: `poetry run tolino-notes --input-file notes.txt --output-dir output --format md`
 
-CI (`.github/workflows/main.yml`) runs `make` across Python 3.9–3.13 on every push to `main` and `feature/*`.
+CI (`.github/workflows/main.yml`) runs `make` across Python 3.10–3.13 on every push to `main` and `feature/*`.
 
 ## Architecture
 

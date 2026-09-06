@@ -12,7 +12,6 @@ classifiers = [
     "Natural Language :: English",
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -20,25 +19,25 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9.0"
-click = "^8"
+python = "^3.10.0"
+click = "8.5.0"
 
 [tool.poetry.dev-dependencies]
-autopep8 = "^2"
-flake8 = "^7"
-flake8-quotes = "^3"
-flake8-docstrings = "^1"
-flake8-builtins = "^2"
-flake8-blind-except = "^0"
-flake8-use-fstring = "^1"
-flake8-isort = "^6"
-pep8-naming = "^0"
-isort = "^5"
-pytest = "^8"
-mypy = "^1"
-typing-extensions = "^4"
-black = "^24"
-pipdeptree = "^2"
+autopep8 = "2.3.2"
+flake8 = "7.3.0"
+flake8-quotes = "3.4.0"
+flake8-docstrings = "1.7.0"
+flake8-builtins = "3.1.0"
+flake8-blind-except = "0.2.1"
+flake8-use-fstring = "1.4"
+flake8-isort = "7.0.0"
+pep8-naming = "0.15.1"
+isort = "9.0.1"
+pytest = "9.1.1"
+mypy = "2.3.1"
+typing-extensions = "4.16.0"
+black = "26.5.1"
+pipdeptree = "4.2.3"
 
 [tool.poetry.scripts]
 tolino-notes = 'tolino_notes.__main__:main'
@@ -63,8 +62,8 @@ warn_unreachable = true
 # Error message config
 # pretty = true
 
-[tool.pytest]
-addopts = "-p no:warnings"
+[tool.pytest.ini_options]
+addopts = ["-p", "no:warnings"]
 
 [tool.black]
 skip-string-normalization = true
