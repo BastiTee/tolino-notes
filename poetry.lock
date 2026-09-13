@@ -179,7 +179,7 @@ description = "Cross-platform colored terminal text."
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 groups = ["dev"]
-markers = "sys_platform == \"win32\" or os_name == \"nt\""
+markers = "os_name == \"nt\" or sys_platform == \"win32\""
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
@@ -674,6 +674,30 @@ files = [
 ]
 
 [[package]]
+name = "nab"
+version = "0.0.17"
+description = "PubGrub-based dependency resolver for Python packages"
+optional = false
+python-versions = ">=3.10"
+groups = ["dev"]
+files = [
+    {file = "nab-0.0.17-py3-none-any.whl", hash = "sha256:c9a3af1ad153a6ad4f565ec5996ab65ccd16534afa32e880b08931403ca9d17e"},
+    {file = "nab-0.0.17.tar.gz", hash = "sha256:ac6adb24630140e32ad872413284199381f0b9d1ed758e3d98bda6cd42a160e2"},
+]
+
+[package.dependencies]
+nab-index = "0.0.17"
+nab-markersets = "0.0.17"
+nab-project = "0.0.17"
+nab-provider = "0.0.17"
+nab-resolver = "0.0.17"
+tomli = ">=2.2"
+typing-extensions = ">=4.6"
+
+[package.extras]
+httpx = ["nab-index[httpx] (==0.0.17)"]
+
+[[package]]
 name = "nab-index"
 version = "0.0.17"
 description = "PyPI Simple-API client and on-disk cache for nab"
@@ -811,47 +835,48 @@ flake8 = ">=5.0.0"
 
 [[package]]
 name = "pipdeptree"
-version = "4.2.3"
+version = "4.2.5"
 description = "Command line utility to show dependency tree of packages."
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "pipdeptree-4.2.3-cp310-abi3-macosx_10_15_x86_64.whl", hash = "sha256:4ffe95b3e6b93e0d064fb82bb8c0d07ac7580e00895f2453ad02a8e8436061c0"},
-    {file = "pipdeptree-4.2.3-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:4a1214ca418bd14b6831e049e0f80cf5abafa591395af81c56e8d6bd319946c4"},
-    {file = "pipdeptree-4.2.3-cp310-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:a6e67cc182ae5de9f72407fe58288e68f9f4e73015ecbca3a6e54d89aca42c9b"},
-    {file = "pipdeptree-4.2.3-cp310-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:cc179df7d118605de35ae240ec493283e0e0c5e69f5adcb25b29f09618f8acde"},
-    {file = "pipdeptree-4.2.3-cp310-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:e2a75b01285d70d907ca650c786182aa77b2a1a0183b31b5f0daa9bab235721d"},
-    {file = "pipdeptree-4.2.3-cp310-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:e19fe782150b550eaf7d887652cb660db4b74c2a2b5f1362ab4abb3c5fcd7d84"},
-    {file = "pipdeptree-4.2.3-cp310-abi3-win_amd64.whl", hash = "sha256:d179be2e75ea2a5d4fd0a5c0aa07dddc9e9a9e7e3d6e139d3897a04604c5309f"},
-    {file = "pipdeptree-4.2.3-cp310-abi3-win_arm64.whl", hash = "sha256:855f24f4aeaac2d0b78db9a29e20976dd844090d5e23e5d200c6b3893dff9f6f"},
-    {file = "pipdeptree-4.2.3-cp314-cp314t-macosx_10_15_x86_64.whl", hash = "sha256:99401c6e232f61074ebacc202f01410b87d92119de21d4acd76633a143e46008"},
-    {file = "pipdeptree-4.2.3-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:cbc10faee0c633839bbb9ffb00e83f8ac0d8cf4466c542e846dae49c329def3e"},
-    {file = "pipdeptree-4.2.3-cp314-cp314t-manylinux_2_28_aarch64.whl", hash = "sha256:ba7d873f26f087ab790d1a27a4216eae34f444ae7c80d65ae0876a442c7e0ef8"},
-    {file = "pipdeptree-4.2.3-cp314-cp314t-manylinux_2_28_x86_64.whl", hash = "sha256:5d455d40c2886c1f46a3a7b1b7937db8af3a81f768d6b86b47d912f36b8eb40c"},
-    {file = "pipdeptree-4.2.3-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:81b66079ea1c7ee87056092e17d86d18ef5c8490ab526d581095807a6fe0a2a0"},
-    {file = "pipdeptree-4.2.3-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:e42fee49ecc9722100ec4a52db9b5390772f0b881f692198d894020500681292"},
-    {file = "pipdeptree-4.2.3-cp314-cp314t-win_amd64.whl", hash = "sha256:d861b9fd9e99c7f05f70448f664889e2499b7a95cfd2537ed2dff5f2d0dd2204"},
-    {file = "pipdeptree-4.2.3-cp314-cp314t-win_arm64.whl", hash = "sha256:120d41f1f70cf6d64c17e955e317903ae5fee7990cd556e83f80faff07f594e9"},
-    {file = "pipdeptree-4.2.3-cp315-cp315t-macosx_10_15_x86_64.whl", hash = "sha256:cae1702e5fb7e45cabea1da8743a4c57279e494c258fbc117081822701c51f04"},
-    {file = "pipdeptree-4.2.3-cp315-cp315t-macosx_11_0_arm64.whl", hash = "sha256:026376ad35ee7a024e35236bd6dbea4d86d8225b6006c6209c651246400a2e78"},
-    {file = "pipdeptree-4.2.3-cp315-cp315t-manylinux_2_28_aarch64.whl", hash = "sha256:5269e354bf70fafe043d646419fe410b088c05445d3912da6d492aa726298e90"},
-    {file = "pipdeptree-4.2.3-cp315-cp315t-manylinux_2_28_x86_64.whl", hash = "sha256:cd35cd217b9ec56eb31a1c555c2657e3d607a1e2e00256827ea74d93e20afd41"},
-    {file = "pipdeptree-4.2.3-cp315-cp315t-musllinux_1_2_aarch64.whl", hash = "sha256:6b83eb7e691e4149da2e5c52f4dbbe4210a976189385046bdb3e008beaa920b9"},
-    {file = "pipdeptree-4.2.3-cp315-cp315t-musllinux_1_2_x86_64.whl", hash = "sha256:bbf7763d1477a64ca279a53d42e75e46bfd243a7deed0712b05cc3f4c06f0797"},
-    {file = "pipdeptree-4.2.3-cp315-cp315t-win_amd64.whl", hash = "sha256:b22544174e5fd5b39cff6f0795db9de4be7ccbe8343699df93c14644ecbf9feb"},
-    {file = "pipdeptree-4.2.3-cp315-cp315t-win_arm64.whl", hash = "sha256:438ae995b9110e72be56e1f28cadb8572141a9fa04c977eb613f0f98e86e2b5f"},
-    {file = "pipdeptree-4.2.3-pp311-pypy311_pp73-macosx_10_15_x86_64.whl", hash = "sha256:11f7acf8602e7341943eeb0e9f19f233d837a8e523dd8803c1da8862bc86aacb"},
-    {file = "pipdeptree-4.2.3-pp311-pypy311_pp73-macosx_11_0_arm64.whl", hash = "sha256:35110204b90ffe51ebd144d19a4e6083a11a7a6b554d3c627ce6986d412b0e95"},
-    {file = "pipdeptree-4.2.3-pp311-pypy311_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:c9d11d7709ef6e8c4d33f555fb22d33ab2e4ab3f2334690057a9b8fdd72bd5e7"},
-    {file = "pipdeptree-4.2.3-pp311-pypy311_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:f598cd96023f2c0e3574b648dd6741cd503405f90af1b80977add28f458fd637"},
-    {file = "pipdeptree-4.2.3-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:eae3b047f9407eeee42354b5afac176060c815bf9fdcfd82e38c2feeaf367d58"},
-    {file = "pipdeptree-4.2.3.tar.gz", hash = "sha256:f95876e4feddadeaffaeb579990bf94bd6035e7dc87569f5cba2ac6669ea3ebe"},
+    {file = "pipdeptree-4.2.5-cp310-abi3-macosx_10_15_x86_64.whl", hash = "sha256:4d940f7a6e7e8bc5fbccbc2182cc8d21fa9623f7c8c9e8bba1a08dca9dc5d050"},
+    {file = "pipdeptree-4.2.5-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:1014bd66756a3089bf81dd1c8b449fab5fed2dd5473338ddf624aca47e3a37a3"},
+    {file = "pipdeptree-4.2.5-cp310-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:bf75abc03d8ad4a50adc3196b6d6b8a0d7e811d846d756b96eb9573c3946579d"},
+    {file = "pipdeptree-4.2.5-cp310-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:8fa50c021f7b9a46703f6c55f3ffe396c0540508f73053f55e4a1f87cec0b652"},
+    {file = "pipdeptree-4.2.5-cp310-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:dafb538a35ef4dbe9bc18f1e4acbd16f1eb5907feff0f659845745244f0990ab"},
+    {file = "pipdeptree-4.2.5-cp310-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:488e4b2f086bb40ca887adcbecbc4cab4c9b101d628004951a418218e705c985"},
+    {file = "pipdeptree-4.2.5-cp310-abi3-win_amd64.whl", hash = "sha256:087cc58fabf63a3b971998892038fe6e578c4d581f60f0af1931fbdb15dae9c3"},
+    {file = "pipdeptree-4.2.5-cp310-abi3-win_arm64.whl", hash = "sha256:6550fcfecd51d56529151dad4033f1e079f1afa14737ea0733c30fbadc2695f8"},
+    {file = "pipdeptree-4.2.5-cp314-cp314t-macosx_10_15_x86_64.whl", hash = "sha256:11aa69a07e10a61d03853b67d10a40c12dd1a7b4a46a4265a5d52e53632244aa"},
+    {file = "pipdeptree-4.2.5-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:8c908c567aeab846f15946b3d122cdfbaba96f42f91d300872aa0eaeb755b341"},
+    {file = "pipdeptree-4.2.5-cp314-cp314t-manylinux_2_28_aarch64.whl", hash = "sha256:aa848be1bb3ee6f02df774e1c37be0a3287ae0744cc397649fc99e7e2581212b"},
+    {file = "pipdeptree-4.2.5-cp314-cp314t-manylinux_2_28_x86_64.whl", hash = "sha256:91584431c4bd0d8fb532054d5b886f9120ffdbc4d363a60299507b6d9b6d0b60"},
+    {file = "pipdeptree-4.2.5-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:041b2377877757c50411bcfcc90c1f86383f23f92e61b8040ec7be9cbc40794f"},
+    {file = "pipdeptree-4.2.5-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:5e2e60371e094c89f0b67a20e116bd4318efdd59542102d90fd5073e803e4841"},
+    {file = "pipdeptree-4.2.5-cp314-cp314t-win_amd64.whl", hash = "sha256:e1788b115b16664641d06714338c6e04ec79ebe3b43d1547e9a6accbba1b2ece"},
+    {file = "pipdeptree-4.2.5-cp314-cp314t-win_arm64.whl", hash = "sha256:858d711768a8401e2cbfff8a68fdf0e70ff4eb5ac8e0064dedee67722f1578d8"},
+    {file = "pipdeptree-4.2.5-cp315-cp315t-macosx_10_15_x86_64.whl", hash = "sha256:c1a3a7a1801c419bca4914e758675e87257bbb4280cead08a226021e4bb94d42"},
+    {file = "pipdeptree-4.2.5-cp315-cp315t-macosx_11_0_arm64.whl", hash = "sha256:87fd94f8b29c6f9ccf5d82e1099b2f7651609f72c0e202701d68946898e4bfc7"},
+    {file = "pipdeptree-4.2.5-cp315-cp315t-manylinux_2_28_aarch64.whl", hash = "sha256:56bbd67569f4d612d898c13480ce153bee70e93fa9f064015ded9037b14f128f"},
+    {file = "pipdeptree-4.2.5-cp315-cp315t-manylinux_2_28_x86_64.whl", hash = "sha256:3ac7c7cc347f75bb82886be88a013d7f63b1a37795958769c30a2878026f0bd9"},
+    {file = "pipdeptree-4.2.5-cp315-cp315t-musllinux_1_2_aarch64.whl", hash = "sha256:03ccecb5fa940d2b0d6f16442bc52ea217933a313f96d7b5aba9c3addc7b8020"},
+    {file = "pipdeptree-4.2.5-cp315-cp315t-musllinux_1_2_x86_64.whl", hash = "sha256:6981573146dcede8b295bd94de1b3dd47589192a8539fff55f3245c73d4c2f53"},
+    {file = "pipdeptree-4.2.5-cp315-cp315t-win_amd64.whl", hash = "sha256:c80b554a82bdd1b066e817c988f0adf7554bcdab612553d2687fc1ab00675ee4"},
+    {file = "pipdeptree-4.2.5-cp315-cp315t-win_arm64.whl", hash = "sha256:e1fbc6fd2c02185728708fa20a3b77e5a1cdcae9860d1d34276d155459d3e78e"},
+    {file = "pipdeptree-4.2.5-pp311-pypy311_pp73-macosx_10_15_x86_64.whl", hash = "sha256:da52d3f768d90099834ae8fbf3e629fe8a716a6bc429a3dcde183fec79a3acea"},
+    {file = "pipdeptree-4.2.5-pp311-pypy311_pp73-macosx_11_0_arm64.whl", hash = "sha256:7ea430ac47a539f56d1b7a1fbd6f661f5db807fb5b26df4a0f32c10e47dff1f2"},
+    {file = "pipdeptree-4.2.5-pp311-pypy311_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:749ac94096ebfe5906fdd94cd686bfd1171b1bc33d6c20c4d1ee37e043173e1a"},
+    {file = "pipdeptree-4.2.5-pp311-pypy311_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:b7d841a9b2651f4f29c4098f5a88b576d06efad3b1fc01b0b7156debb5e6e2c0"},
+    {file = "pipdeptree-4.2.5-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:485bce47718743665c4ed42f92241c0328087814d91495ddd53ab65abc62f21f"},
+    {file = "pipdeptree-4.2.5.tar.gz", hash = "sha256:0fafc3201c046e72913abb8a7a2b75cb17c3e15ebdd3ed546adf8fe9a9d4f54e"},
 ]
 
 [package.dependencies]
-nab-index = ">=0.0.11"
-nab-project = ">=0.0.14"
+nab = ">=0.0.17"
+nab-index = ">=0.0.17"
+nab-project = ">=0.0.17"
 
 [[package]]
 name = "platformdirs"
@@ -1197,4 +1222,4 @@ type = ["pytest-mypy (>=1.0.1) ; platform_python_implementation != \"PyPy\""]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10.0"
-content-hash = "965221cafd60418ad7bbad965d0720e340c577c4402f81b10d1e99654eb3065b"
+content-hash = "a6c128908053f7c0836d16171f8fb998b9d3b63ff3240aaf38578b987945339f"

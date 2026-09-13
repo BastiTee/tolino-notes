@@ -37,7 +37,7 @@ pytest = "9.1.1"
 mypy = "2.3.1"
 typing-extensions = "4.16.0"
 black = "26.5.1"
-pipdeptree = "4.2.3"
+pipdeptree = "4.2.5"
 
 [tool.poetry.scripts]
 tolino-notes = 'tolino_notes.__main__:main'
